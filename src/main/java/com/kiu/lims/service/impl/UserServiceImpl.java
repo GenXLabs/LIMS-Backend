@@ -1,6 +1,6 @@
-package com.kiu.lims.service.serviceImplementation;
+package com.kiu.lims.service.impl;
 
-import com.kiu.lims.model.User;
+import com.kiu.lims.entity.User;
 import com.kiu.lims.repository.UserRepository;
 import com.kiu.lims.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

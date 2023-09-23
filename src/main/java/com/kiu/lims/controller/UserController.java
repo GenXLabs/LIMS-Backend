@@ -1,6 +1,6 @@
 package com.kiu.lims.controller;
 
-import com.kiu.lims.model.User;
+import com.kiu.lims.entity.User;
 import com.kiu.lims.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/v1/lims/user")
 @CrossOrigin
 
 public class UserController {

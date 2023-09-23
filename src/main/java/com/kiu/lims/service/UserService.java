@@ -1,6 +1,6 @@
 package com.kiu.lims.service;
 
-import com.kiu.lims.model.User;
+import com.kiu.lims.entity.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
