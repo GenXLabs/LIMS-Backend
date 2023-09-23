@@ -1,4 +1,4 @@
-package com.kiu.lims.model;
+package com.kiu.lims.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
