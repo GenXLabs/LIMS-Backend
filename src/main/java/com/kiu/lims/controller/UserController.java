@@ -1,4 +1,5 @@
 package com.kiu.lims.controller;
+import com.kiu.lims.model.UserDTO;
 
 import com.kiu.lims.entity.User;
 import com.kiu.lims.service.UserService;
@@ -11,37 +12,36 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/lims/user")
 @CrossOrigin
-
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     @PostMapping("/add")
-    public String addUser(@RequestBody User user){
-        userService.addUser(user);
+    public String addUser(@RequestBody UserDTO userDTO){
+        userService.addUser(userDTO);
 
         return "successfully add user";
     }
 
     @GetMapping()
-    public List<User> getUsers(){
+    public List<UserDTO> getUsers(){
         return userService.getUsers();
     }
 
     @GetMapping("/get")
-    public User getUser(@RequestParam Integer id){
+    public UserDTO getUser(@RequestParam Integer id){
         return userService.getUser(id);
     }
 
     @GetMapping("/getEmail")
-    public User getUser(@RequestParam String email){
+    public UserDTO getUser(@RequestParam String email){
         return userService.getUser(email);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Void> updateUser(@PathVariable Integer id, @RequestBody User user){
-        userService.updateUser(id, user);
+    public ResponseEntity<Void> updateUser(@PathVariable Integer id, @RequestBody UserDTO userDTO){
+        userService.updateUser(id, userDTO);
 
         return ResponseEntity.noContent().build();
     }
@@ -52,6 +52,4 @@ public class UserController {
 
         return ResponseEntity.noContent().build();
     }
-
-
 }
