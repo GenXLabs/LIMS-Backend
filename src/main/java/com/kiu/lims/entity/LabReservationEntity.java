@@ -61,4 +61,37 @@ public class LabReservationEntity {
 
     @JsonProperty("deleted_at")
     private Timestamp deletedAt;
+
+    @JsonProperty("requester_email")
+    private String requesterEmail;
+
+    @JsonProperty("requester_full_name")
+    private String requesterFullName;
+
+    @JsonProperty("requester_phone")
+    private String requesterPhone;
+
+    public String getRequesterEmail() {
+        return requesterEmail;
+    }
+
+    public void setRequesterEmail(String requesterEmail) {
+        this.requesterEmail = requesterEmail;
+    }
+
+    public String getRequesterFullName() {
+        return requesterFullName;
+    }
+
+    public void setRequesterFullName(String requesterFullName) {
+        this.requesterFullName = requesterFullName;
+    }
+
+    public String getRequesterPhone() {
+        return requesterPhone;
+    }
+
+    public void setRequesterPhone(String requesterPhone) {
+        this.requesterPhone = requesterPhone;
+    }
 }
