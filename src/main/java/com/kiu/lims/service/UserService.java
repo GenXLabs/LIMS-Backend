@@ -15,10 +15,10 @@ public interface UserService {
 
     List<UserDTO> getUsers();
 
-    UserDTO getUser(Integer id);
+    UserDTO getUser(Long userId);
     UserDTO getUser(String email);
 
-    void updateUser(Integer id, UserDTO userDTO);
+    void updateUser(Long userId, UserDTO userDTO);
 
-    void deleteUser(Integer id);
+    void deleteUser(Long userId);
 }

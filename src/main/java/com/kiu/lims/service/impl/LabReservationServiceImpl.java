@@ -33,7 +33,7 @@ public class LabReservationServiceImpl implements LabReservationService {
                 // Iterate through the reservations to fetch requester information
                 for (LabReservationEntity reservation : labReservationEntityList) {
                     Long requesterId = reservation.getRequesterId();
-                    User requester = UserRepository.findById(Math.toIntExact(requesterId)).orElse(null);
+                    User requester = UserRepository.findById(requesterId).orElse(null);
 
                     // If requester is found, set email and full_name
                     if (requester != null) {

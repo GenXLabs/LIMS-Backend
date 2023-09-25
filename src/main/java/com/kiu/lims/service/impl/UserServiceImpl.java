@@ -42,9 +42,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUser(Integer id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id" + id));
+    public UserDTO getUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id" + userId));
         return convertToUserDTO(user);
     }
 
@@ -58,12 +58,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(Integer id, UserDTO userDTO) {
-        userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id" + id));
+    public void updateUser(Long userId, UserDTO userDTO) {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id" + userId));
 
         User user = convertToUserEntity(userDTO);
-        user.setId(id);
+        user.setUserId(userId);
 
         // Hash the password before saving it
         String hashedPassword = passwordEncoder.encode(userDTO.getPassword());
@@ -73,9 +73,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Integer id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id" + id));
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id" + userId));
         userRepository.delete(user);
     }
 
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
 
     private UserDTO convertToUserDTO(User user) {
         UserDTO userDTO = new UserDTO();
-        userDTO.setId(user.getId());
+        userDTO.setId(user.getUserId());
         userDTO.setFullName(user.getFullName());
         userDTO.setEmail(user.getEmail());
         userDTO.setPhoneNumber(user.getPhoneNumber());
