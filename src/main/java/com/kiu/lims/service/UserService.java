@@ -1,4 +1,5 @@
 package com.kiu.lims.service;
+import com.kiu.lims.model.UserDTO;
 
 import com.kiu.lims.entity.User;
 import org.springframework.context.annotation.Bean;
@@ -10,14 +11,14 @@ import java.util.List;
 
 
 public interface UserService {
-    void addUser(User user);
+    void addUser(UserDTO userDTO);
 
-    List<User> getUsers();
+    List<UserDTO> getUsers();
 
-    User getUser(Integer id);
-    User getUser(String email);
+    UserDTO getUser(Long userId);
+    UserDTO getUser(String email);
 
-    void updateUser(Integer id, User user);
+    void updateUser(Long userId, UserDTO userDTO);
 
-    void deleteUser(Integer id);
+    void deleteUser(Long userId);
 }
