@@ -66,8 +66,8 @@ public class UserServiceImpl implements UserService {
         user.setUserId(userId);
 
         // Hash the password before saving it
-        String hashedPassword = passwordEncoder.encode(userDTO.getPassword());
-        user.setPassword(hashedPassword);
+//        String hashedPassword = passwordEncoder.encode(userDTO.getPassword());
+//        user.setPassword(hashedPassword);
 
         userRepository.save(user);
     }
