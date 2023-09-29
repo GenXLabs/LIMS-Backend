@@ -1,6 +1,5 @@
 package com.kiu.lims.controller;
 
-
 import com.kiu.lims.entity.TimetableEvent;
 import com.kiu.lims.service.TimetableEventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/lims/timetable-events")
+@CrossOrigin
 public class TimetableEventController {
 
     private final TimetableEventService eventService;
@@ -36,12 +36,14 @@ public class TimetableEventController {
 
     @PostMapping
     public ResponseEntity<TimetableEvent> createTimetableEvent(@RequestBody TimetableEvent event) {
+
         TimetableEvent createdEvent = eventService.createTimetableEvent(event);
         return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<TimetableEvent> updateTimetableEvent(@PathVariable Long id, @RequestBody TimetableEvent event) throws ChangeSetPersister.NotFoundException {
+
         TimetableEvent updatedEvent = eventService.updateTimetableEvent(id, event);
         return new ResponseEntity<>(updatedEvent, HttpStatus.OK);
     }
@@ -52,4 +54,3 @@ public class TimetableEventController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
-
