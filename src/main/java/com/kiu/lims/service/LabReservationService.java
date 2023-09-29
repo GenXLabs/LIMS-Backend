@@ -8,7 +8,6 @@ public interface LabReservationService {
 
     ResponseModel getLabReservationsByRequester(Long requesterId);
 
-
     ResponseModel addLabReservation(Long userId, LabReservationEntity reservation);
 
     ResponseModel updateLabReservation(LabReservationEntity reservation);
