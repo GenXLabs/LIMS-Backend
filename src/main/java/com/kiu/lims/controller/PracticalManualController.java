@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 @CrossOrigin
 @RestController
 @RequestMapping("/api/v1/lims/practical-manual")
@@ -50,15 +52,32 @@ public class PracticalManualController {
         // Your implementation here
     }
 
-
     @PutMapping("/update/{manualId}")
-    public ResponseModel updatePracticalManual(@PathVariable Long manualId, @RequestBody PracticalManualEntity updatedManual) {
-        return practicalManualService.updatePracticalManual(manualId, updatedManual);
+    public ResponseModel updatePracticalManual(
+            @PathVariable Long manualId,
+            @RequestBody Map<String, Object> updatedFields
+    ) {
+        return practicalManualService.updatePracticalManual(manualId, updatedFields);
     }
 
-    @DeleteMapping("/delete/{manualId}")
-    public ResponseModel deletePracticalManual(@PathVariable Long manualId) {
-        return practicalManualService.deletePracticalManual(manualId);
+
+
+//    @PutMapping("/update/{manualId}")
+//    public ResponseModel updatePracticalManual(@PathVariable Long manualId, @RequestBody PracticalManualEntity updatedManual) {
+//        return practicalManualService.updatePracticalManual(manualId, updatedManual);
+//    }
+
+//    @DeleteMapping("/delete/{manualId}")
+//    public ResponseModel deletePracticalManual(@PathVariable Long manualId) {
+//        return practicalManualService.deletePracticalManual(manualId);
+//    }
+
+    @PutMapping("/delete/{manualId}")
+    public ResponseModel deletePracticalManual(
+            @PathVariable Long manualId,
+            @RequestBody Map<String, Object> deletedFields
+    ) {
+        return practicalManualService.deletePracticalManual(manualId, deletedFields);
     }
 
     @GetMapping("/download-pdf/{manualId}")

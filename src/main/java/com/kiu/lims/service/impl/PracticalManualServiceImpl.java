@@ -19,9 +19,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -78,15 +76,35 @@ public class PracticalManualServiceImpl implements PracticalManualService {
         return responseModel;
     }
 
-
     @Override
-    public ResponseModel updatePracticalManual(Long manualId, PracticalManualEntity updatedManual) {
+    public ResponseModel updatePracticalManual(Long manualId, Map<String, Object> updatedFields) {
         ResponseModel responseModel = new ResponseModel();
         try {
             Optional<PracticalManualEntity> optionalManual = practicalManualRepository.findById(manualId);
             if (optionalManual.isPresent()) {
-                updatedManual.setManualId(manualId);
-                PracticalManualEntity savedManual = practicalManualRepository.save(updatedManual);
+                PracticalManualEntity existingManual = optionalManual.get();
+
+                // Update only the provided fields
+                if (updatedFields.containsKey("title")) {
+                    existingManual.setTitle((String) updatedFields.get("title"));
+                }
+                if (updatedFields.containsKey("description")) {
+                    existingManual.setDescription((String) updatedFields.get("description"));
+                }
+                if (updatedFields.containsKey("module_category")) {
+                    // Assuming module_category is an Integer in PracticalManualEntity
+                    existingManual.setModuleCategory(Long.valueOf((Integer) updatedFields.get("module_category")));
+                }
+                if (updatedFields.containsKey("updated_by")) {
+                    // Assuming updated_by is an Integer in PracticalManualEntity
+                    existingManual.setUpdatedBy((Integer) updatedFields.get("updated_by"));
+                }
+
+                // Set the manualId and updatedAt from the existing manual
+                existingManual.setManualId(manualId);
+                existingManual.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+
+                PracticalManualEntity savedManual = practicalManualRepository.save(existingManual);
                 responseModel.setCode(200); // OK
                 responseModel.setMessage("Practical manual updated successfully.");
                 responseModel.setData(savedManual);
@@ -103,14 +121,24 @@ public class PracticalManualServiceImpl implements PracticalManualService {
     }
 
     @Override
-    public ResponseModel deletePracticalManual(Long manualId) {
+    public ResponseModel deletePracticalManual(Long manualId, Map<String, Object> deletedFields) {
         ResponseModel responseModel = new ResponseModel();
         try {
             Optional<PracticalManualEntity> optionalManual = practicalManualRepository.findById(manualId);
             if (optionalManual.isPresent()) {
-                practicalManualRepository.deleteById(manualId);
-                responseModel.setCode(204); // No Content
+                PracticalManualEntity existingManual = optionalManual.get();
+
+                // Set deleted_at and deleted_by
+                existingManual.setDeletedAt(new Timestamp(System.currentTimeMillis()));
+                if (deletedFields.containsKey("deleted_by")) {
+                    // Assuming deleted_by is an Integer in PracticalManualEntity
+                    existingManual.setDeletedBy((Integer) deletedFields.get("deleted_by"));
+                }
+
+                PracticalManualEntity savedManual = practicalManualRepository.save(existingManual);
+                responseModel.setCode(200); // OK
                 responseModel.setMessage("Practical manual deleted successfully.");
+                responseModel.setData(savedManual);
             } else {
                 responseModel.setCode(404); // Not Found
                 responseModel.setMessage("Practical manual not found.");
@@ -122,6 +150,28 @@ public class PracticalManualServiceImpl implements PracticalManualService {
         }
         return responseModel;
     }
+
+
+//    @Override
+//    public ResponseModel deletePracticalManual(Long manualId) {
+//        ResponseModel responseModel = new ResponseModel();
+//        try {
+//            Optional<PracticalManualEntity> optionalManual = practicalManualRepository.findById(manualId);
+//            if (optionalManual.isPresent()) {
+//                practicalManualRepository.deleteById(manualId);
+//                responseModel.setCode(204); // No Content
+//                responseModel.setMessage("Practical manual deleted successfully.");
+//            } else {
+//                responseModel.setCode(404); // Not Found
+//                responseModel.setMessage("Practical manual not found.");
+//            }
+//        } catch (Exception e) {
+//            responseModel.setCode(500); // Internal Server Error
+//            responseModel.setMessage("An error occurred while deleting the practical manual.");
+//            // You can log the exception or include additional error details in the message.
+//        }
+//        return responseModel;
+//    }
 
     @Override
     public ResponseModel getPracticalManualById(Long manualId) {
