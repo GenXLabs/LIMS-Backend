@@ -4,10 +4,23 @@ import com.kiu.lims.entity.PracticalManualEntity;
 import com.kiu.lims.model.ResponseModel;
 import com.kiu.lims.repository.PracticalManualRepository;
 import com.kiu.lims.service.PracticalManualService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -33,10 +46,26 @@ public class PracticalManualServiceImpl implements PracticalManualService {
     }
 
     @Override
-    public ResponseModel createPracticalManual(PracticalManualEntity manual) {
+    public ResponseModel createPracticalManual(PracticalManualEntity manual, MultipartFile file) {
         ResponseModel responseModel = new ResponseModel();
+
         try {
+            if (file != null && !file.isEmpty()) {
+                // Save the uploaded file to a specific directory (e.g., "uploads").
+                String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+                String uploadDir = "uploads";
+                String filePath = Paths.get(uploadDir, fileName).toString();
+                Files.createDirectories(Paths.get(uploadDir));
+                Files.copy(file.getInputStream(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
+
+                // Set the file path in the manual entity.
+                manual.setFilePath(filePath);
+            }
+
+            manual.setCreatedAt(Timestamp.from(Instant.now()));
+            // Save the practical manual entity to the database.
             PracticalManualEntity savedManual = practicalManualRepository.save(manual);
+
             responseModel.setCode(201); // Created
             responseModel.setMessage("Practical manual created successfully.");
             responseModel.setData(savedManual);
@@ -45,8 +74,10 @@ public class PracticalManualServiceImpl implements PracticalManualService {
             responseModel.setMessage("An error occurred while creating the practical manual.");
             // You can log the exception or include additional error details in the message.
         }
+
         return responseModel;
     }
+
 
     @Override
     public ResponseModel updatePracticalManual(Long manualId, PracticalManualEntity updatedManual) {
@@ -106,5 +137,27 @@ public class PracticalManualServiceImpl implements PracticalManualService {
             responseModel.setMessage("Practical manual not found.");
         }
         return responseModel;
+    }
+
+    @Override
+    public Resource downloadManualPdf(Long manualId) {
+        Optional<PracticalManualEntity> optionalManual = practicalManualRepository.findById(manualId);
+
+        if (optionalManual.isPresent()) {
+            PracticalManualEntity manual = optionalManual.get();
+            String filePath = manual.getFilePath();
+            try {
+                Resource resource = new UrlResource(Paths.get(filePath).toUri());
+                if (resource.exists()) {
+                    return resource;
+                } else {
+                    throw new FileNotFoundException("PDF file not found");
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Error downloading PDF file", e);
+            }
+        } else {
+            throw new EntityNotFoundException("Practical manual not found");
+        }
     }
 }

@@ -21,7 +21,6 @@ public class ModuleCategoryEntity {
     @JsonProperty("category_id")
     private Long categoryId;
 
-    @Column(name = "category_name")
     @JsonProperty("category_name")
     private String categoryName;
 
@@ -31,9 +30,80 @@ public class ModuleCategoryEntity {
     @JsonProperty("updated_by")
     private Integer updatedBy;
 
+    @JsonProperty("deleted_by")
+    private Integer deletedBy;
+
     @JsonProperty("created_at")
     private Timestamp createdAt;
 
     @JsonProperty("updated_at")
     private Timestamp updatedAt;
+
+    @JsonProperty("deleted_at")
+    private Timestamp deletedAt;
+
+    // Getters and setters for the fields
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String name) {
+        this.categoryName = name;
+    }
+
+    public Integer getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Integer createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Integer getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(Integer updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Integer getDeletedBy() {
+        return deletedBy;
+    }
+
+    public void setDeletedBy(Integer deletedBy) {
+        this.deletedBy = deletedBy;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Timestamp getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Timestamp deletedAt) {
+        this.deletedAt = deletedAt;
+    }
 }

@@ -46,4 +46,7 @@ public class PracticalManualEntity {
     @JsonProperty("deleted_at")
     private Timestamp deletedAt;
 
+    @Column(name = "file_path")
+    private String filePath;
+
 }
