@@ -16,43 +16,43 @@ import java.sql.Timestamp;
 public class InventoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name ="inventory_id",unique = true)
+    @Column(name ="inventory_id", unique = true)
     @JsonProperty("inventory_id")
     private Long inventoryid;
 
-    //INVENTORY NO,	INVENTORY NAME,AVAILABILITY,NEWLY ARRIVALS,	BROKEN,	RETURNS,BALANCE
     @JsonProperty("inventory_name")
     private String inventoryname;
+
     @JsonProperty("availability")
     private Integer availability;
+
     @JsonProperty("newly")
     private Integer newly;
+
     @JsonProperty("broken")
     private Integer broken;
+
     @JsonProperty("returns")
     private Integer returns;
+
     @JsonProperty("balance")
     private Integer balance;
+
     @JsonProperty("created_by")
     private Integer created_by;
 
     @JsonProperty("updated_by")
     private Integer updatedBy;
+
     @JsonProperty("deleted_by")
     private Integer deletedBy;
+
     @JsonProperty("created_at")
     private Timestamp createdAt;
+
     @JsonProperty("updated_at")
     private Timestamp updatedAt;
+
     @JsonProperty("deleted_at")
     private Timestamp deletedAt;
-
-
-
-
-
-
-
-
-
 }

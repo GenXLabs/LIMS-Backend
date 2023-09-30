@@ -1,9 +1,19 @@
 package com.kiu.lims.service;
 
+import com.kiu.lims.entity.InventoryEntity;
 
-import com.kiu.lims.model.ResponseModel;
+import java.util.List;
 
 public interface InventoryService {
 
-    ResponseModel getAllInventoryManagement();
+    List<InventoryEntity> getAllInventory();
+
+    InventoryEntity getInventoryById(Long id);
+
+    InventoryEntity createInventory(InventoryEntity inventory);
+
+    InventoryEntity updateInventoryById(Long id, InventoryEntity updatedInventory);
+
+
+    boolean deleteInventoryById(Long id);
 }
