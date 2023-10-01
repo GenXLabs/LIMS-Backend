@@ -118,7 +118,7 @@ public class LabReservationServiceImpl implements LabReservationService {
 
         return responseModel;
     }
-    
+
     @Override
     public ResponseModel updateLabReservation(LabReservationEntity updatedFields) {
         ResponseModel responseModel = new ResponseModel();
