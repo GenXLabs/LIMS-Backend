@@ -9,6 +9,7 @@ import com.kiu.lims.service.LabReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -117,37 +118,37 @@ public class LabReservationServiceImpl implements LabReservationService {
 
         return responseModel;
     }
-
-
-
+    
     @Override
-    public ResponseModel updateLabReservation(LabReservationEntity reservation) {
+    public ResponseModel updateLabReservation(LabReservationEntity updatedFields) {
         ResponseModel responseModel = new ResponseModel();
 
         try {
-            LabReservationEntity existingReservation = labReservationRepository.findById(reservation.getReservationId()).orElse(null);
+            LabReservationEntity existingReservation = labReservationRepository.findById(updatedFields.getReservationId()).orElse(null);
 
             if (existingReservation == null) {
                 responseModel.setCode(404); // Not Found
                 responseModel.setMessage("Lab reservation not found.");
             } else {
-                // Update all fields of the existing reservation
-                existingReservation.setTitle(reservation.getTitle());
-                existingReservation.setBatch(reservation.getBatch());
-                existingReservation.setVenue(reservation.getVenue());
-                existingReservation.setDate(reservation.getDate());
-                existingReservation.setStartTime(reservation.getStartTime());
-                existingReservation.setEndTime(reservation.getEndTime());
-                existingReservation.setDescription(reservation.getDescription());
-                existingReservation.setCalendar(reservation.getCalendar());
-                existingReservation.setRequesterId(reservation.getRequesterId());
-                existingReservation.setStatus(reservation.getStatus());
-                existingReservation.setCreatedBy(reservation.getCreatedBy());
-                existingReservation.setCreatedAt(reservation.getCreatedAt());
-                existingReservation.setUpdatedBy(reservation.getUpdatedBy());
-                existingReservation.setUpdatedAt(reservation.getUpdatedAt());
-                existingReservation.setDeletedBy(reservation.getDeletedBy());
-                existingReservation.setDeletedAt(reservation.getDeletedAt());
+                // Update only the specific fields you want to change
+                if (updatedFields.getDate() != null) {
+                    existingReservation.setDate(updatedFields.getDate());
+                }
+                if (updatedFields.getStartTime() != null) {
+                    existingReservation.setStartTime(updatedFields.getStartTime());
+                }
+                if (updatedFields.getEndTime() != null) {
+                    existingReservation.setEndTime(updatedFields.getEndTime());
+                }
+                if (updatedFields.getDescription() != null) {
+                    existingReservation.setDescription(updatedFields.getDescription());
+                }
+                if (updatedFields.getUpdatedBy() != null) {
+                    existingReservation.setUpdatedBy(updatedFields.getUpdatedBy());
+                }
+
+                // Set the 'updated_at' field to the current timestamp
+                existingReservation.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
                 LabReservationEntity updatedReservation = labReservationRepository.save(existingReservation);
                 responseModel.setCode(200); // OK
@@ -162,6 +163,7 @@ public class LabReservationServiceImpl implements LabReservationService {
 
         return responseModel;
     }
+
 
     @Override
     public ResponseModel updateReservationStatus(Long reservationId, Byte status) {
