@@ -29,11 +29,11 @@ public class UserController {
         return userService.getUsers();
     }
 
-    @GetMapping("/get")
-    public UserDTO getUser(@RequestParam Long id){
-        return userService.getUser(id);
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+        UserDTO userDTO = userService.getUser(id);
+        return ResponseEntity.ok(userDTO);
     }
-
     @GetMapping("/getEmail")
     public UserDTO getUser(@RequestParam String email){
         return userService.getUser(email);
