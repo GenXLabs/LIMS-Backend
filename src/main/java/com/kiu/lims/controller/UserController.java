@@ -40,11 +40,37 @@ public class UserController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Void> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO){
-        userService.updateUser(id, userDTO);
+    public ResponseEntity<Void> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+        if (isPasswordUpdate(userDTO)) {
+            if (!isNewPasswordConfirmed(userDTO)) {
+                // Return a bad request response if the new password and confirmation don't match
+                return ResponseEntity.badRequest().build();
+            }
+
+            // Handle password update separately
+            userService.updatePassword(id, userDTO);
+        } else {
+            // Handle updates to other fields
+            userService.updateUser(id, userDTO);
+        }
 
         return ResponseEntity.noContent().build();
     }
+
+    private boolean isPasswordUpdate(UserDTO userDTO) {
+        // Check if the newPassword field is provided (indicating a password update)
+        return userDTO.getNewPassword() != null && !userDTO.getNewPassword().isEmpty();
+    }
+
+    private boolean isNewPasswordConfirmed(UserDTO userDTO) {
+        // Check if the new password and confirmation match
+        return userDTO.getNewPassword() != null &&
+                userDTO.getConfirmNewPassword() != null &&
+                userDTO.getNewPassword().equals(userDTO.getConfirmNewPassword());
+    }
+
+
+
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){
