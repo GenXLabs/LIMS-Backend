@@ -17,8 +17,8 @@ public class InstrumentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sop_id", unique = true)
-    @JsonProperty("sop_Id")
-    private Long sopId;
+    @JsonProperty("manual_id")
+    private Long manualId;
 
     private String title;
     private String description;
@@ -40,6 +40,10 @@ public class InstrumentEntity {
 
     @JsonProperty("deleted_at")
     private Timestamp deletedAt;
+
+    @Column(name = "file_path")
+    private String filePath;
+
 
 
 }
