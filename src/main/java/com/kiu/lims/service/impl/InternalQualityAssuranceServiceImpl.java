@@ -1,117 +1,213 @@
 package com.kiu.lims.service.impl;
 
 import com.kiu.lims.entity.InternalQualityAssuranceEntity;
+import com.kiu.lims.entity.PracticalManualEntity;
 import com.kiu.lims.model.ResponseModel;
 import com.kiu.lims.repository.InternalQualityAssuranceRepository;
 import com.kiu.lims.service.InternalQualityAssuranceService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class InternalQualityAssuranceServiceImpl implements InternalQualityAssuranceService {
 
-    @Autowired
-    private InternalQualityAssuranceRepository internalQualityAssuranceRepository;
+    private final InternalQualityAssuranceRepository internalQualityAssuranceRepository;
 
     @Override
     public ResponseModel getAllInternalQualityAssurance() {
         ResponseModel responseModel = new ResponseModel();
-        List<InternalQualityAssuranceEntity> internalQualityAssuranceEntityList;
+        List<InternalQualityAssuranceEntity> internalQualityAssuranceEntityList = internalQualityAssuranceRepository.findAll();
 
-        try {
-            internalQualityAssuranceEntityList = internalQualityAssuranceRepository.findAll();
-
-            if (internalQualityAssuranceEntityList.isEmpty()) {
-                responseModel.setCode(204);
-                responseModel.setMessage("No Internal Quality Assurance found");
-            } else {
-                responseModel.setCode(200);
-                responseModel.setMessage("Successful");
-                responseModel.setData(internalQualityAssuranceEntityList);
-            }
-        } catch (Exception e) {
-            responseModel.setCode(500);
-            responseModel.setMessage("Internal Server Error");
+        if (internalQualityAssuranceEntityList.isEmpty()) {
+            responseModel.setCode(204); // No Content
+            responseModel.setMessage("No reports found.");
+        } else {
+            responseModel.setCode(200);
+            responseModel.setMessage("Practical reports retrieved successfully.");
+            responseModel.setData(internalQualityAssuranceEntityList);
         }
         return responseModel;
     }
 
     @Override
-    public ResponseModel createInternalQualityAssurance(InternalQualityAssuranceEntity newEntity) {
+    public ResponseModel createInternalQualityAssurance(InternalQualityAssuranceEntity manual, MultipartFile file) {
         ResponseModel responseModel = new ResponseModel();
 
         try {
-            // Save the new entity to the database
-            InternalQualityAssuranceEntity savedEntity = internalQualityAssuranceRepository.save(newEntity);
+            if (file != null && !file.isEmpty()) {
+                // Save the uploaded file to a specific directory (e.g., "uploads").
+                String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+                String uploadDir = "uploads";
+                String filePath = Paths.get(uploadDir, fileName).toString();
+                Files.createDirectories(Paths.get(uploadDir));
+                Files.copy(file.getInputStream(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
 
-            responseModel.setCode(201); // 201 Created
-            responseModel.setMessage("Internal Quality Assurance created successfully");
-            responseModel.setData(savedEntity);
-        } catch (Exception e) {
-            responseModel.setCode(500); // 500 Internal Server Error
-            responseModel.setMessage("Failed to create Internal Quality Assurance");
-        }
-
-        return responseModel;
-    }
-
-    @Override
-    public ResponseModel updateInternalQualityAssurance(Long id, InternalQualityAssuranceEntity updatedEntity) {
-        ResponseModel responseModel = new ResponseModel();
-
-        try {
-            Optional<InternalQualityAssuranceEntity> existingEntityOptional = internalQualityAssuranceRepository.findById(id);
-
-            if (existingEntityOptional.isPresent()) {
-                InternalQualityAssuranceEntity existingEntity = existingEntityOptional.get();
-
-                // Update the fields of the existing entity with the values from updatedEntity
-                existingEntity.setTitle(updatedEntity.getTitle());
-                existingEntity.setDescription(updatedEntity.getDescription());
-
-                // Save the updated entity
-                InternalQualityAssuranceEntity updatedEntityInDB = internalQualityAssuranceRepository.save(existingEntity);
-
-                responseModel.setCode(200); // 200 OK
-                responseModel.setMessage("Internal Quality Assurance updated successfully");
-                responseModel.setData(updatedEntityInDB);
-            } else {
-                responseModel.setCode(404); // 404 Not Found
-                responseModel.setMessage("Internal Quality Assurance not found");
+                // Set the file path in the manual entity.
+                manual.setFilePath(filePath);
             }
+
+            manual.setCreatedAt(Timestamp.from(Instant.now()));
+            // Save the practical manual entity to the database.
+            InternalQualityAssuranceEntity savedManual = internalQualityAssuranceRepository.save(manual);
+
+            responseModel.setCode(201); // Created
+            responseModel.setMessage("Report created successfully.");
+            responseModel.setData(savedManual);
         } catch (Exception e) {
-            responseModel.setCode(500); // 500 Internal Server Error
-            responseModel.setMessage("Failed to update Internal Quality Assurance");
+            responseModel.setCode(500); // Internal Server Error
+            responseModel.setMessage("An error occurred while creating the reports.");
+            // You can log the exception or include additional error details in the message.
         }
 
         return responseModel;
     }
 
     @Override
-    public ResponseModel deleteInternalQualityAssurance(Long id) {
+    public ResponseModel updateInternalQualityAssurance(Long manualId, Map<String, Object> updatedFields) {
         ResponseModel responseModel = new ResponseModel();
-
         try {
-            Optional<InternalQualityAssuranceEntity> entityToDeleteOptional = internalQualityAssuranceRepository.findById(id);
+            Optional<InternalQualityAssuranceEntity> optionalManual = internalQualityAssuranceRepository.findById(manualId);
+            if (optionalManual.isPresent()) {
+                InternalQualityAssuranceEntity existingManual = optionalManual.get();
 
-            if (entityToDeleteOptional.isPresent()) {
-                // Delete the entity from the database
-                internalQualityAssuranceRepository.deleteById(id);
+                // Update only the provided fields
+                if (updatedFields.containsKey("title")) {
+                    existingManual.setTitle((String) updatedFields.get("title"));
+                }
+                if (updatedFields.containsKey("description")) {
+                    existingManual.setDescription((String) updatedFields.get("description"));
+                }
+                if (updatedFields.containsKey("updated_by")) {
+                    // Assuming updated_by is an Integer in InternalQualityAssuranceEntity
+                    existingManual.setUpdatedBy((Integer) updatedFields.get("updated_by"));
+                }
 
-                responseModel.setCode(200); // 200 OK
-                responseModel.setMessage("Internal Quality Assurance deleted successfully");
+                // Set the manualId and updatedAt from the existing manual
+                existingManual.setManualId(manualId);
+                existingManual.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+
+                InternalQualityAssuranceEntity savedManual = internalQualityAssuranceRepository.save(existingManual);
+                responseModel.setCode(200); // OK
+                responseModel.setMessage("Practical manual updated successfully.");
+                responseModel.setData(savedManual);
             } else {
-                responseModel.setCode(404); // 404 Not Found
-                responseModel.setMessage("Internal Quality Assurance not found");
+                responseModel.setCode(404); // Not Found
+                responseModel.setMessage("Practical manual not found.");
             }
         } catch (Exception e) {
-            responseModel.setCode(500); // 500 Internal Server Error
-            responseModel.setMessage("Failed to delete Internal Quality Assurance");
+            responseModel.setCode(500); // Internal Server Error
+            responseModel.setMessage("An error occurred while updating the practical manual.");
+            // You can log the exception or include additional error details in the message.
         }
-
         return responseModel;
+    }
+
+    @Override
+    public ResponseModel deleteInternalQualityAssurance(Long manualId, Map<String, Object> deletedFields) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            Optional<InternalQualityAssuranceEntity> optionalManual = internalQualityAssuranceRepository.findById(manualId);
+            if (optionalManual.isPresent()) {
+                InternalQualityAssuranceEntity existingManual = optionalManual.get();
+
+                // Set deleted_at and deleted_by
+                existingManual.setDeletedAt(new Timestamp(System.currentTimeMillis()));
+                if (deletedFields.containsKey("deleted_by")) {
+                    // Assuming deleted_by is an Integer in PracticalManualEntity
+                    existingManual.setDeletedBy((Integer) deletedFields.get("deleted_by"));
+                }
+
+                InternalQualityAssuranceEntity savedManual = internalQualityAssuranceRepository.save(existingManual);
+                responseModel.setCode(200); // OK
+                responseModel.setMessage("Practical manual deleted successfully.");
+                responseModel.setData(savedManual);
+            } else {
+                responseModel.setCode(404); // Not Found
+                responseModel.setMessage("Practical manual not found.");
+            }
+        } catch (Exception e) {
+            responseModel.setCode(500); // Internal Server Error
+            responseModel.setMessage("An error occurred while deleting the practical manual.");
+            // You can log the exception or include additional error details in the message.
+        }
+        return responseModel;
+    }
+
+
+//    @Override
+//    public ResponseModel deletePracticalManual(Long manualId) {
+//        ResponseModel responseModel = new ResponseModel();
+//        try {
+//            Optional<PracticalManualEntity> optionalManual = practicalManualRepository.findById(manualId);
+//            if (optionalManual.isPresent()) {
+//                practicalManualRepository.deleteById(manualId);
+//                responseModel.setCode(204); // No Content
+//                responseModel.setMessage("Practical manual deleted successfully.");
+//            } else {
+//                responseModel.setCode(404); // Not Found
+//                responseModel.setMessage("Practical manual not found.");
+//            }
+//        } catch (Exception e) {
+//            responseModel.setCode(500); // Internal Server Error
+//            responseModel.setMessage("An error occurred while deleting the practical manual.");
+//            // You can log the exception or include additional error details in the message.
+//        }
+//        return responseModel;
+//    }
+
+    @Override
+    public ResponseModel getInternalQualityById(Long manualId) {
+        ResponseModel responseModel = new ResponseModel();
+        Optional<InternalQualityAssuranceEntity> optionalManual = internalQualityAssuranceRepository.findById(manualId);
+
+        if (optionalManual.isPresent()) {
+            responseModel.setCode(200); // OK
+            responseModel.setMessage("Practical manual retrieved successfully.");
+            responseModel.setData(optionalManual.get());
+        } else {
+            responseModel.setCode(404); // Not Found
+            responseModel.setMessage("Practical manual not found.");
+        }
+        return responseModel;
+    }
+
+    @Override
+    public Resource downloadManualPdf(Long manualId) {
+        Optional<InternalQualityAssuranceEntity> optionalManual = internalQualityAssuranceRepository.findById(manualId);
+
+        if (optionalManual.isPresent()) {
+            InternalQualityAssuranceEntity manual = optionalManual.get();
+            String filePath = manual.getFilePath();
+            try {
+                Resource resource = new UrlResource(Paths.get(filePath).toUri());
+                if (resource.exists()) {
+                    return resource;
+                } else {
+                    throw new FileNotFoundException("PDF file not found");
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Error downloading PDF file", e);
+            }
+        } else {
+            throw new EntityNotFoundException("Practical manual not found");
+        }
     }
 }
