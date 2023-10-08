@@ -18,8 +18,8 @@ public class InternalQualityAssuranceEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "iqa_id", unique = true)
-    @JsonProperty("iqa_id")
-    private Long iqaId;
+    @JsonProperty("manual_id")
+    private Long manualId;
 
     private String title;
 
@@ -42,4 +42,7 @@ public class InternalQualityAssuranceEntity {
 
     @JsonProperty("deleted_at")
     private Timestamp deletedAt;
+
+    @Column(name = "file_path")
+    private String filePath;
 }
