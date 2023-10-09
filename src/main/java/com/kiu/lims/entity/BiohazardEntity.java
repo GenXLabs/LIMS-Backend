@@ -7,16 +7,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
-
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "sop_table")
-public class InstrumentEntity {
+@Table(name = "bio_table")
+
+public class BiohazardEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "sop_id", unique = true)
+    @Column(name = "bio_id", unique = true)
     @JsonProperty("manual_id")
     private Long manualId;
 
@@ -44,6 +44,5 @@ public class InstrumentEntity {
     @Column(name = "file_path")
     private String filePath;
 
-
-
 }
+

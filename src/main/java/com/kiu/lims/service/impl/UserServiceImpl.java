@@ -59,17 +59,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUser(Long userId, UserDTO userDTO) {
-        userRepository.findById(userId)
+        User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id" + userId));
 
-        User user = convertToUserEntity(userDTO);
-        user.setUserId(userId);
+        // Update other user details
+        existingUser.setFullName(userDTO.getFullName());
+        existingUser.setEmail(userDTO.getEmail());
+        existingUser.setPhoneNumber(userDTO.getPhoneNumber());
 
-        // Hash the password before saving it
-//        String hashedPassword = passwordEncoder.encode(userDTO.getPassword());
-//        user.setPassword(hashedPassword);
+        userRepository.save(existingUser);
+    }
 
-        userRepository.save(user);
+    @Override
+    public void updatePassword(Long userId, UserDTO userDTO) {
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid user id" + userId));
+
+        // Check if the provided password matches the stored password
+        if (!passwordEncoder.matches(userDTO.getPassword(), existingUser.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Incorrect password");
+        }
+
+        // Hash and update the new password
+        String hashedPassword = passwordEncoder.encode(userDTO.getNewPassword());
+        existingUser.setPassword(hashedPassword);
+
+        userRepository.save(existingUser);
     }
 
     @Override
