@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Map;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/lims/internal-quality-assurance")
 public class InternalQualityAssuranceController {
