@@ -1,10 +1,8 @@
 package com.kiu.lims.service.impl;
 
 import com.kiu.lims.entity.AuditEntity;
-import com.kiu.lims.entity.InternalQualityAssuranceEntity;
 import com.kiu.lims.model.ResponseModel;
 import com.kiu.lims.repository.AuditRepository;
-import com.kiu.lims.repository.InternalQualityAssuranceRepository;
 import com.kiu.lims.service.AuditService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

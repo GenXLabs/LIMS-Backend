@@ -1,10 +1,8 @@
 package com.kiu.lims.controller;
 
 import com.kiu.lims.entity.AuditEntity;
-import com.kiu.lims.entity.InternalQualityAssuranceEntity;
 import com.kiu.lims.model.ResponseModel;
 import com.kiu.lims.service.AuditService;
-import com.kiu.lims.service.InternalQualityAssuranceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +31,7 @@ public class AuditController {
     }
 
     @GetMapping("/get-all")
-    public ResponseModel getAllInternalQualityAssurance() {
+    public ResponseModel getAllAudit() {
         return auditService.getAllAudit();
     }
 
@@ -55,7 +53,7 @@ public class AuditController {
     }
 
     @PutMapping("/update/{manualId}")
-    public ResponseModel updateaudit(
+    public ResponseModel updateAudit(
             @PathVariable Long manualId,
             @RequestBody Map<String, Object> updatedFields
     ) {
