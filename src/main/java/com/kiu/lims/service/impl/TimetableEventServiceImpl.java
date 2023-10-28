@@ -32,6 +32,12 @@ public class TimetableEventServiceImpl implements TimetableEventService {
 
     @Override
     public TimetableEvent createTimetableEvent(TimetableEvent event) {
+        // Check for duplicates based on date, time, and venue
+        if (eventRepository.existsByDateAndTimeAndVenue(event.getDate(), event.getTime(), event.getVenue())) {
+            throw new DuplicateTimetableEventException("A duplicate event already exists for the given date, time, and venue.");
+        }
+
+        // If no duplicates found, save the event
         return eventRepository.save(event);
     }
 
@@ -39,12 +45,19 @@ public class TimetableEventServiceImpl implements TimetableEventService {
     public TimetableEvent updateTimetableEvent(Long id, TimetableEvent updatedEvent) throws ChangeSetPersister.NotFoundException {
         TimetableEvent existingEvent = getTimetableEventById(id);
 
+        // Check for duplicates based on date, time, and venue when updating
+        if (!existingEvent.getDate().equals(updatedEvent.getDate()) ||
+                !existingEvent.getTime().equals(updatedEvent.getTime()) ||
+                !existingEvent.getVenue().equals(updatedEvent.getVenue())) {
+            if (eventRepository.existsByDateAndTimeAndVenue(updatedEvent.getDate(), updatedEvent.getTime(), updatedEvent.getVenue())) {
+                throw new DuplicateTimetableEventException("A duplicate event already exists for the updated date, time, and venue.");
+            }
+        }
 
+        // Update the event's properties
         existingEvent.setEventTitle(updatedEvent.getEventTitle());
-
         existingEvent.setVenue(updatedEvent.getVenue());
         existingEvent.setEmail(updatedEvent.getEmail());
-
 
         return eventRepository.save(existingEvent);
     }
@@ -54,3 +67,4 @@ public class TimetableEventServiceImpl implements TimetableEventService {
         eventRepository.deleteById(id);
     }
 }
+

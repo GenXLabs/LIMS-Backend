@@ -23,10 +23,11 @@ public class TimetableEventController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TimetableEvent>> getAllTimetableEvents() {
+    public ResponseEntity<List<TimetableEvent>> getAllTimetableEvents() throws ChangeSetPersister.NotFoundException {
         List<TimetableEvent> events = eventService.getAllTimetableEvents();
         return new ResponseEntity<>(events, HttpStatus.OK);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<TimetableEvent> getTimetableEventById(@PathVariable Long id) throws ChangeSetPersister.NotFoundException {
@@ -49,7 +50,7 @@ public class TimetableEventController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTimetableEvent(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTimetableEvent(@PathVariable Long id) throws ChangeSetPersister.NotFoundException {
         eventService.deleteTimetableEvent(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
