@@ -1,10 +1,9 @@
 package com.kiu.lims.service.impl;
 
-import com.kiu.lims.entity.InternalQualityAssuranceEntity;
-import com.kiu.lims.entity.PracticalManualEntity;
+import com.kiu.lims.entity.AuditEntity;
 import com.kiu.lims.model.ResponseModel;
-import com.kiu.lims.repository.InternalQualityAssuranceRepository;
-import com.kiu.lims.service.InternalQualityAssuranceService;
+import com.kiu.lims.repository.AuditRepository;
+import com.kiu.lims.service.AuditService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -27,28 +26,28 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class InternalQualityAssuranceServiceImpl implements InternalQualityAssuranceService {
+public class AuditServiceImpl implements AuditService {
 
-    private final InternalQualityAssuranceRepository internalQualityAssuranceRepository;
+    private final AuditRepository auditRepository;
 
     @Override
-    public ResponseModel getAllInternalQualityAssurance() {
+    public ResponseModel getAllAudit() {
         ResponseModel responseModel = new ResponseModel();
-        List<InternalQualityAssuranceEntity> internalQualityAssuranceEntityList = internalQualityAssuranceRepository.findAll();
+        List<AuditEntity> auditEntityList = auditRepository.findAll();
 
-        if (internalQualityAssuranceEntityList.isEmpty()) {
+        if (auditEntityList.isEmpty()) {
             responseModel.setCode(204); // No Content
             responseModel.setMessage("No reports found.");
         } else {
             responseModel.setCode(200);
-            responseModel.setMessage("Instrument reports retrieved successfully.");
-            responseModel.setData(internalQualityAssuranceEntityList);
+            responseModel.setMessage("Audit reports retrieved successfully.");
+            responseModel.setData(auditEntityList);
         }
         return responseModel;
     }
 
     @Override
-    public ResponseModel createInternalQualityAssurance(InternalQualityAssuranceEntity manual, MultipartFile file) {
+    public ResponseModel createAudit(AuditEntity manual, MultipartFile file) {
         ResponseModel responseModel = new ResponseModel();
 
         try {
@@ -66,7 +65,7 @@ public class InternalQualityAssuranceServiceImpl implements InternalQualityAssur
 
             manual.setCreatedAt(Timestamp.from(Instant.now()));
             // Save the practical manual entity to the database.
-            InternalQualityAssuranceEntity savedManual = internalQualityAssuranceRepository.save(manual);
+            AuditEntity savedManual = auditRepository.save(manual);
 
             responseModel.setCode(201); // Created
             responseModel.setMessage("Report created successfully.");
@@ -81,12 +80,12 @@ public class InternalQualityAssuranceServiceImpl implements InternalQualityAssur
     }
 
     @Override
-    public ResponseModel updateInternalQualityAssurance(Long manualId, Map<String, Object> updatedFields) {
+    public ResponseModel updateAudit(Long manualId, Map<String, Object> updatedFields) {
         ResponseModel responseModel = new ResponseModel();
         try {
-            Optional<InternalQualityAssuranceEntity> optionalManual = internalQualityAssuranceRepository.findById(manualId);
+            Optional<AuditEntity> optionalManual = auditRepository.findById(manualId);
             if (optionalManual.isPresent()) {
-                InternalQualityAssuranceEntity existingManual = optionalManual.get();
+                AuditEntity existingManual = optionalManual.get();
 
                 // Update only the provided fields
                 if (updatedFields.containsKey("title")) {
@@ -104,29 +103,29 @@ public class InternalQualityAssuranceServiceImpl implements InternalQualityAssur
                 existingManual.setManualId(manualId);
                 existingManual.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
-                InternalQualityAssuranceEntity savedManual = internalQualityAssuranceRepository.save(existingManual);
+                AuditEntity savedManual = auditRepository.save(existingManual);
                 responseModel.setCode(200); // OK
-                responseModel.setMessage("Practical manual updated successfully.");
+                responseModel.setMessage("Audit report updated successfully.");
                 responseModel.setData(savedManual);
             } else {
                 responseModel.setCode(404); // Not Found
-                responseModel.setMessage("Practical manual not found.");
+                responseModel.setMessage("Audit report not found.");
             }
         } catch (Exception e) {
             responseModel.setCode(500); // Internal Server Error
-            responseModel.setMessage("An error occurred while updating the practical manual.");
+            responseModel.setMessage("An error occurred while updating the Audit report.");
             // You can log the exception or include additional error details in the message.
         }
         return responseModel;
     }
 
     @Override
-    public ResponseModel deleteInternalQualityAssurance(Long manualId, Map<String, Object> deletedFields) {
+    public ResponseModel deleteAudit(Long manualId, Map<String, Object> deletedFields) {
         ResponseModel responseModel = new ResponseModel();
         try {
-            Optional<InternalQualityAssuranceEntity> optionalManual = internalQualityAssuranceRepository.findById(manualId);
+            Optional<AuditEntity> optionalManual = auditRepository.findById(manualId);
             if (optionalManual.isPresent()) {
-                InternalQualityAssuranceEntity existingManual = optionalManual.get();
+                AuditEntity existingManual = optionalManual.get();
 
                 // Set deleted_at and deleted_by
                 existingManual.setDeletedAt(new Timestamp(System.currentTimeMillis()));
@@ -135,17 +134,17 @@ public class InternalQualityAssuranceServiceImpl implements InternalQualityAssur
                     existingManual.setDeletedBy((Integer) deletedFields.get("deleted_by"));
                 }
 
-                InternalQualityAssuranceEntity savedManual = internalQualityAssuranceRepository.save(existingManual);
+                AuditEntity savedManual = auditRepository.save(existingManual);
                 responseModel.setCode(200); // OK
-                responseModel.setMessage("Practical manual deleted successfully.");
+                responseModel.setMessage("Audit report deleted successfully.");
                 responseModel.setData(savedManual);
             } else {
                 responseModel.setCode(404); // Not Found
-                responseModel.setMessage("Practical manual not found.");
+                responseModel.setMessage("Audit report not found.");
             }
         } catch (Exception e) {
             responseModel.setCode(500); // Internal Server Error
-            responseModel.setMessage("An error occurred while deleting the practical manual.");
+            responseModel.setMessage("An error occurred while deleting the Audit report.");
             // You can log the exception or include additional error details in the message.
         }
         return responseModel;
@@ -174,27 +173,27 @@ public class InternalQualityAssuranceServiceImpl implements InternalQualityAssur
 //    }
 
     @Override
-    public ResponseModel getInternalQualityById(Long manualId) {
+    public ResponseModel getAuditById(Long manualId) {
         ResponseModel responseModel = new ResponseModel();
-        Optional<InternalQualityAssuranceEntity> optionalManual = internalQualityAssuranceRepository.findById(manualId);
+        Optional<AuditEntity> optionalManual = auditRepository.findById(manualId);
 
         if (optionalManual.isPresent()) {
             responseModel.setCode(200); // OK
-            responseModel.setMessage("Practical manual retrieved successfully.");
+            responseModel.setMessage("Audit report retrieved successfully.");
             responseModel.setData(optionalManual.get());
         } else {
             responseModel.setCode(404); // Not Found
-            responseModel.setMessage("Practical manual not found.");
+            responseModel.setMessage("Audit report not found.");
         }
         return responseModel;
     }
 
     @Override
     public Resource downloadManualPdf(Long manualId) {
-        Optional<InternalQualityAssuranceEntity> optionalManual = internalQualityAssuranceRepository.findById(manualId);
+        Optional<AuditEntity> optionalManual = auditRepository.findById(manualId);
 
         if (optionalManual.isPresent()) {
-            InternalQualityAssuranceEntity manual = optionalManual.get();
+            AuditEntity manual = optionalManual.get();
             String filePath = manual.getFilePath();
             try {
                 Resource resource = new UrlResource(Paths.get(filePath).toUri());
@@ -207,7 +206,8 @@ public class InternalQualityAssuranceServiceImpl implements InternalQualityAssur
                 throw new RuntimeException("Error downloading PDF file", e);
             }
         } else {
-            throw new EntityNotFoundException("Practical manual not found");
+            throw new EntityNotFoundException("Audit report not found");
         }
     }
+
 }
